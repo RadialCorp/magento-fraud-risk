@@ -464,6 +464,15 @@ class Radial_Eb2cFraud_Model_Build_Request
 	$subPayloadCustomPropertyGroup->setName("GSI_CUSTOM");
         $this->_buildCustomProperty($subPayloadCustomPropertyGroup, "SPLIT_ORDER", "Y");
 	$this->_buildCustomProperty($subPayloadCustomPropertyGroup, "SPLIT_ORDER_REF_ORD_IDS", implode(',',$this->_orderIds));
+	
+	$admin = Mage::getModel('customer/session')->getAdmin();
+	if($admin->getId() != '') 
+	{
+		$this->_buildCustomProperty($subPayloadCustomPropertyGroup, "OrderSource", "CSR");
+	} else {
+		$this->_buildCustomProperty($subPayloadCustomPropertyGroup, "OrderSource", "WEB");
+	}
+
         $subPayloadCustomProperties->offsetSet($subPayloadCustomPropertyGroup);
     }
 
