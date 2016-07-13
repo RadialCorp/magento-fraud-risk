@@ -36,13 +36,35 @@ class Radial_Eb2cFraud_Model_Payment_Adapter_Default
 			->setExtractExpireDate($this->_helper->getPaymentExpireDate($payment))
 			->setExtractCardType($this->_helper->getMapEb2cFraudPaymentMethod($payment));
 
-		if( array_key_exists('avs_response_code', $additionalInformation) && array_key_exists('cvv2_response_code', $additionalInformation))
-		{
-			$this->setExtractTransactionResponses(array(
-					array('type' => 'avsZip', 'response' => $additionalInformation['avs_response_code']),
-					array('type' => 'avsAddr', 'response' => $additionalInformation['avs_response_code']),
-					array('type' => 'cvv2',	   'response' => $additionalInformation['cvv2_response_code'])));
-		}
+		$transArray = array();
+
+                if( isset($additionalInformation['avs_response_code']))
+                {
+                        $transArray[] = array('type' => 'avsZip', 'response' => $additionalInformation['avs_response_code']);
+                        $transArray[] = array('type' => 'avsAddr', 'response' => $additionalInformation['avs_response_code']);
+                }
+
+                if( isset($additionalInformation['cvv2_response_code']))
+                {
+                        $transArray[] = array('type' => 'cvv2',    'response' => $additionalInformation['cvv2_response_code']);
+                }
+
+                if( isset($additionalInformation['phone_response_code']))
+                {
+                        $transArray[] = array('type' => 'AmexPhone',    'response' => $additionalInformation['phone_response_code']);
+                }
+
+                if( isset($additionalInformation['name_response_code']))
+                {
+                        $transArray[] = array('type' => 'AmexName',    'response' => $additionalInformation['name_response_code']);
+                }
+
+                if( isset($additionalInformation['email_response_code']))
+                {
+                        $transArray[] = array('type' => 'AmexEmail',    'response' => $additionalInformation['email_response_code']);
+                }
+
+		$this->setExtractTransactionResponses($transArray);
 
 		return $this;
 	}
