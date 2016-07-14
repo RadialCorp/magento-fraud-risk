@@ -483,12 +483,13 @@ class Radial_Eb2cFraud_Model_Build_Request
 	$orderPayment = $this->_order->getPayment();
 	$orderPaymentAi = $orderPayment->getAdditionalInformation();
 
-	$admin = Mage::getModel('customer/session')->getAdmin();
-	if($admin && $admin->getId() != '') 
+	Mage::getSingleton('core/session', array('name'=>'adminhtml'));
+
+        if (Mage::getSingleton('adminhtml/session_quote')->getQuote()->getId())
 	{
-		$this->_buildCustomProperty($subPayloadCustomPropertyGroup, "OrderSource", "CSR");
+		$this->_buildCustomProperty($subPayloadCustomPropertyGroup, "ORDER_SOURCE", "CSR");
 	} else {
-		$this->_buildCustomProperty($subPayloadCustomPropertyGroup, "OrderSource", "WEB");
+		$this->_buildCustomProperty($subPayloadCustomPropertyGroup, "ORDER_SOURCE", "WEB");
 	}
 
 	$paymentCode = $this->_config->getTenderTypeForCcType($orderPayment->getCcType() ? $orderPayment->getCcType() : $orderPayment->getMethod());
