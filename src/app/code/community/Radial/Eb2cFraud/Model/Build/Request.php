@@ -871,7 +871,17 @@ class Radial_Eb2cFraud_Model_Build_Request
         } else {
                 $storeId = Mage::getStoreConfig('radial_core/general/store_id');
 
-                $subPayloadCard->setOrderAppId($storeId.'-eb2c');
+		$storeId = Mage::getStoreConfig('radial_core/general/store_id');
+                $clientId = Mage::getStoreConfig('radial_core/general/client_id');
+                $continent = substr($clientId, -2);
+
+                if( strcmp($continent, 'NA') === 0 )
+                {
+                        $subPayloadCard->setOrderAppId('eb2c-'.$storeId.'-'.$continent.'-'.'LVS');
+                } else {
+                        $subPayloadCard->setOrderAppId('eb2c-'.$storeId.'-'.$continent);
+                }
+
                 $subPayloadCard->setPaymentSessionId($this->_order->getIncrementId());
         }
 
