@@ -856,12 +856,32 @@ class Radial_Eb2cFraud_Model_Build_Request
         Radial_Eb2cFraud_Model_Payment_Adapter_IType $paymentAdapterType
     )
     {
+	$paymentAddl = $this->_order->getPayment()->getAdditionalInformation();
+
         $subPayloadCard->setCardHolderName($paymentAdapterType->getExtractCardHolderName())
             ->setPaymentAccountUniqueId($paymentAdapterType->getExtractPaymentAccountUniqueId())
             ->setIsToken($paymentAdapterType->getExtractIsToken())
             ->setPaymentAccountBin($paymentAdapterType->getExtractPaymentAccountBin())
             ->setExpireDate($paymentAdapterType->getExtractExpireDate())
             ->setCardType($paymentAdapterType->getExtractCardType());
+
+	if( isset($paymentAddl['paypal_express_checkout_token']))
+        {
+                $subPayloadCard->setGatewayKey($paymentAddl['paypal_express_checkout_token']);
+        } else {
+                $storeId = Mage::getStoreConfig('radial_core/general/store_id');
+                $clientId = Mage::getStoreConfig('radial_core/general/client_id');
+                $continent = substr($clientId, -2);
+
+                if( strcmp($continent, 'NA') === 0 )
+                {
+                        $subPayloadCard->setOrderAppId('eb2c'.$storeId.$continent.'LVS');
+                } else {
+                        $subPayloadCard->setOrderAppId('eb2c'.$storeId.$continent);
+                }
+                $subPayloadCard->setPaymentSessionId($this->_order->getIncrementId());
+        }
+
         return $this;
     }
 
