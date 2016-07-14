@@ -211,7 +211,9 @@ class Radial_Eb2cFraud_Model_Build_Request
     {
         $this->_buildOrder($this->_request->getOrder());
 	$this->_buildServerInfo($this->_request->getServerInfo());
-        $this->_buildDeviceInfo($this->_request->getDeviceInfo());
+	$this->_buildDeviceInfo($this->_request->getDeviceInfo());
+	$this->_buildCustomProperties($this->_request->getCustomProperties());
+
         return $this;
     }
 
@@ -469,7 +471,50 @@ class Radial_Eb2cFraud_Model_Build_Request
 
         return $this;
     }
+    /**
+     * @param  Radial_RiskService_Sdk_ICustomProperties
+     * @return self
+     */
+    protected function _buildCustomProperties(Radial_RiskService_Sdk_ICustomProperties $subPayloadCustomProperties)
+    {
+	$subPayloadCustomPropertyGroup = $subPayloadCustomProperties->getEmptyCustomPropertyGroup();
+	$subPayloadCustomPropertyGroup->setName("GSI_CUSTOM");
 
+	$orderPayment = $this->_order->getPayment();
+	$orderPaymentAi = $orderPayment->getAdditionalInformation();
+
+	$admin = Mage::getModel('customer/session')->getAdmin();
+	if($admin && $admin->getId() != '') 
+	{
+		$this->_buildCustomProperty($subPayloadCustomPropertyGroup, "OrderSource", "CSR");
+	} else {
+		$this->_buildCustomProperty($subPayloadCustomPropertyGroup, "OrderSource", "WEB");
+	}
+
+	$paymentCode = $this->_config->getTenderTypeForCcType($orderPayment->getCcType() ? $orderPayment->getCcType() : $orderPayment->getMethod());
+
+	if( strcmp("PY", $paymentCode) === 0 )
+	{
+		if( isset( $orderPaymentAi['paypal_express_checkout_payer_country']))
+		{
+			$this->_buildCustomProperty($subPayloadCustomPropertyGroup, "PAYPAL_PAYER_COUNTRY", $orderPaymentAi['paypal_express_checkout_payer_country']);
+			$this->_buildCustomProperty($subPayloadCustomPropertyGroup, "PAYMENT_DESCRIPTION", "Paypal");
+		}
+	}
+
+        $subPayloadCustomProperties->offsetSet($subPayloadCustomPropertyGroup);
+    }
+    /**
+     * @param  Radial_RiskService_Sdk_ICustomPropertyGroup, PropertyName, PropertyValue (String)
+     * @return self
+     */
+    protected function _buildCustomProperty(Radial_RiskService_Sdk_ICustomPropertyGroup $subPayloadCustomPropertyGroup, $propertyName, $propertyValue)
+    {
+	$subPayloadCustomProperty = $subPayloadCustomPropertyGroup->getEmptyCustomProperty();
+        $subPayloadCustomProperty->setName($propertyName);
+	$subPayloadCustomProperty->setStringValue($propertyValue);
+        $subPayloadCustomPropertyGroup->offsetSet($subPayloadCustomProperty);
+    }
     private function getNewRemoteAddr()
     {
 	$remoteAddr = Mage::helper('core/http')->getRemoteAddr();
