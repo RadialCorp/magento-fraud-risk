@@ -34,7 +34,7 @@ class Radial_Eb2cFraud_Model_Payment_Adapter_Default
 			->setExtractIsToken(static::IS_TOKEN)
 			->setExtractPaymentAccountBin($this->_helper->getAccountBin($payment))
 			->setExtractExpireDate($this->_helper->getPaymentExpireDate($payment))
-			->setExtractCardType($this->_helper->getMapEb2cFraudPaymentMethod($payment));
+			->setExtractCardType($this->_config->getTenderTypeForCcType($payment->getCcType() ? $payment->getCcType() : $payment->getMethod()));
 
 		$transArray = array();
 

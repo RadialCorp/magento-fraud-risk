@@ -27,7 +27,7 @@ class Radial_Eb2cFraud_Model_Payment_Adapter_Paypal_Express
 			->setExtractIsToken(static::IS_NOT_TOKEN)
 			->setExtractPaymentAccountBin(null)
 			->setExtractExpireDate(null)
-			->setExtractCardType("PAYPAL")
+			->setExtractCardType("PY")
 			->setExtractTransactionResponses($this->_getPaypalTransactions($payment));
 		return $this;
 	}
