@@ -25,6 +25,7 @@ class Radial_Eb2cFraud_Helper_Config
 	const API_HOSTNAME = 'radial_core/api/hostname';
 	const API_KEY = 'radial_core/api/key';
 	const API_TIMEOUT = 'radial_core/api/timeout';
+	const RESPONSE_TIMEOUT = 'radial_core/fraud/responsetimeout';
 	const MAXRETRIES = 'radial_core/fraud/maxretries';
 	const DEBUG = 'radial_core/fraud/debug';
 	const FRAUD_EMAIL = 'radial_core/fraud/fraud_email';
@@ -140,6 +141,16 @@ class Radial_Eb2cFraud_Helper_Config
 		return Mage::getStoreConfig(static::API_TIMEOUT, $store);
 	}
 
+    /**
+     * retrieve the response timeout setting from store config
+     *
+     * @param  mixed
+     * @return string
+     */
+    public function getResponseTimeout($store=null)
+    {
+            return Mage::getStoreConfig(static::RESPONSE_TIMEOUT, $store);
+    }
 
     /**
      * retrieve the payment method card type map settings from store config

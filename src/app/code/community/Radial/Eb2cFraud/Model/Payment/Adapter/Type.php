@@ -26,6 +26,8 @@ class Radial_Eb2cFraud_Model_Payment_Adapter_Type
 	protected $_order;
 	/** @var Radial_Eb2cFraud_Helper_Data */
 	protected $_helper;
+	/** @var Radial_Eb2cFraud_Helper_Config */
+	protected $_config;
 	/** @var string | null */
 	protected $_extractCardHolderName;
 	/** @var string | null */
@@ -45,12 +47,14 @@ class Radial_Eb2cFraud_Model_Payment_Adapter_Type
 	 * @param array $initParams Must have this key:
 	 *                          - 'order' => Mage_Sales_Model_Order
 	 *                          - 'helper' => Radial_Eb2cFraud_Helper_Data
+	 *			    - 'config' => Radial_Eb2cFraud_Helper_Config
 	 */
 	public function __construct(array $initParams=array())
 	{
-		list($this->_order, $this->_helper) = $this->_checkTypes(
+		list($this->_order, $this->_helper, $this->_config) = $this->_checkTypes(
 			$this->_nullCoalesce($initParams, 'order', $initParams['order']),
-			$this->_nullCoalesce($initParams, 'helper', Mage::helper('radial_eb2cfraud'))
+			$this->_nullCoalesce($initParams, 'helper', Mage::helper('radial_eb2cfraud')),
+			$this->_nullCoalesce($initParams, 'config', Mage::helper('radial_eb2cfraud/config'))
 		);
 		$this->_initialize();
 	}
@@ -64,9 +68,10 @@ class Radial_Eb2cFraud_Model_Payment_Adapter_Type
 	 */
 	protected function _checkTypes(
 		Mage_Sales_Model_Order $order,
-		Radial_Eb2cFraud_Helper_Data $helper
+		Radial_Eb2cFraud_Helper_Data $helper,
+		Radial_Eb2cFraud_Helper_Config $config
 	) {
-		return array($order, $helper);
+		return array($order, $helper, $config);
 	}
 
 	/**

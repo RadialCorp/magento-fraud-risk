@@ -1,6 +1,5 @@
 # Core
 src/app/code/community/Radial/Eb2cFraud/ app/code/community/Radial/Eb2cFraud/
-src/app/etc/*.xml.sample app/etc/
 src/app/etc/modules/*.xml app/etc/modules/
 
 # Layout

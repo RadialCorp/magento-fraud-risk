@@ -10,7 +10,7 @@ class Radial_Eb2cFraud_Block_Adminhtml_System_Config_Backend_Messagereset extend
         	$html = $this->getLayout()->createBlock('adminhtml/widget_button')
                     ->setType('button')
                     ->setClass('scalable')
-                    ->setLabel('Reset Messages at Max Transmission')
+                    ->setLabel('Reset Fraud Messages at Max Transmission')
                     ->setOnClick("setLocation('$url')")
                     ->toHtml();
 

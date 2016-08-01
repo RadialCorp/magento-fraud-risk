@@ -27,7 +27,7 @@ class Radial_Eb2cFraud_Model_Payment_Adapter_Paypal_Express
 			->setExtractIsToken(static::IS_NOT_TOKEN)
 			->setExtractPaymentAccountBin(null)
 			->setExtractExpireDate(null)
-			->setExtractCardType("PAYPAL")
+			->setExtractCardType("PY")
 			->setExtractTransactionResponses($this->_getPaypalTransactions($payment));
 		return $this;
 	}
@@ -66,8 +66,18 @@ class Radial_Eb2cFraud_Model_Payment_Adapter_Paypal_Express
 	protected function _getPaypalTransactions(Mage_Payment_Model_Info $payment)
 	{
 		$info = $this->_getPaypalInfo($payment);
-		return array(
-			array('type' => 'PayPalAddress', 'response' => strtolower($info['paypal_express_checkout_address_status'])),
-		);
+		$transArray = array();
+
+                if( isset($info['paypal_express_checkout_address_status']))
+                {
+                        $transArray[] = array('type' => 'PayPalAddress', 'response' => strtolower($info['paypal_express_checkout_address_status']));
+                }
+
+                if( isset($info['paypal_express_checkout_payer_status']))
+                {
+                        $transArray[] = array('type' => 'PayPalPayer', 'response' => strtolower($info['paypal_express_checkout_payer_status']));
+                }
+
+                return $transArray;
 	}
 }

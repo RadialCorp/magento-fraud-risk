@@ -26,7 +26,7 @@ class Radial_Eb2cFraud_Model_Adminhtml_System_Config_Backend_Totalnumretry exten
                                                                          )
                                                 )->getSize();
 	
-	$publicDisplay = '# of Messages Waiting For Transmission Retry: '. $objectCollectionSize;
+	$publicDisplay = '# of Fraud Messages Waiting For Transmission Retry: '. $objectCollectionSize;
 
         $this->setValue($publicDisplay);
         return $this;

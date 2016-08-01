@@ -98,6 +98,7 @@ class Radial_Eb2cFraud_Model_Risk_Order
                         'api_key' => $this->_config->getApiKey(),
                         'host' => $this->_config->getApiHostname(),
                         'store_id' => $this->_config->getStoreId(),
+			'responsetimeout' => $this->_config->getResponseTimeout(),
                         'request' => $request,
                         'response' => $response,
                 ));
@@ -327,7 +328,7 @@ class Radial_Eb2cFraud_Model_Risk_Order
         }
 
 
-	/**
+    /**
      * Sends the event from the database to Sonic, as configured in local.xml
      */
     public function sendEvent() {
@@ -417,7 +418,6 @@ class Radial_Eb2cFraud_Model_Risk_Order
 										}
                         						}
 								}
-
                                 			}
                         			}
 					}

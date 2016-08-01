@@ -215,11 +215,7 @@ class Radial_Eb2cFraud_Model_Build_Request
         $this->_buildOrder($this->_request->getOrder());
 	$this->_buildServerInfo($this->_request->getServerInfo());
         $this->_buildDeviceInfo($this->_request->getDeviceInfo());
-
-	if( count($this->_orderIds) > 0 )
-	{
-		$this->_buildCustomProperties($this->_request->getCustomProperties());
-	}
+	$this->_buildCustomProperties($this->_request->getCustomProperties());
 
         return $this;
     }
@@ -462,6 +458,30 @@ class Radial_Eb2cFraud_Model_Build_Request
     {
 	$subPayloadCustomPropertyGroup = $subPayloadCustomProperties->getEmptyCustomPropertyGroup();
 	$subPayloadCustomPropertyGroup->setName("GSI_CUSTOM");
+
+	$orderPayment = $this->_order->getPayment();
+	$orderPaymentAi = $orderPayment->getAdditionalInformation();
+
+	Mage::getSingleton('core/session', array('name'=>'adminhtml'));
+
+        if (Mage::getSingleton('adminhtml/session_quote')->getQuote()->getId())
+	{
+		$this->_buildCustomProperty($subPayloadCustomPropertyGroup, "ORDER_SOURCE", "CSR");
+	} else {
+		$this->_buildCustomProperty($subPayloadCustomPropertyGroup, "ORDER_SOURCE", "WEB");
+	}
+
+	$paymentCode = $this->_config->getTenderTypeForCcType($orderPayment->getCcType() ? $orderPayment->getCcType() : $orderPayment->getMethod());
+ 
+	if( strcmp("PY", $paymentCode) === 0 )
+	{
+		if( isset( $orderPaymentAi['paypal_express_checkout_payer_country']))
+		{
+			$this->_buildCustomProperty($subPayloadCustomPropertyGroup, "PAYPAL_PAYER_COUNTRY", $orderPaymentAi['paypal_express_checkout_payer_country']);
+			$this->_buildCustomProperty($subPayloadCustomPropertyGroup, "PAYMENT_DESCRIPTION", "Paypal");
+		}
+	}
+
         $this->_buildCustomProperty($subPayloadCustomPropertyGroup, "SPLIT_ORDER", "Y");
 	$this->_buildCustomProperty($subPayloadCustomPropertyGroup, "SPLIT_ORDER_REF_ORD_IDS", implode(',',$this->_orderIds));
 	
@@ -585,8 +605,18 @@ class Radial_Eb2cFraud_Model_Build_Request
                 	$orderShippingAddressId = $orderShippingAddress->getId();
 		}
 
-		$shippingMethod = $this->_shippingHelper->getUsableMethod($orderShippingAddress);
-		if( strcmp($type, 'virtual') === 0 )
+		$shippingMethod = Mage::getSingleton('checkout/session')->getQuote()->getShippingAddress()->getShippingMethod();
+
+		if(!$shippingMethod)
+                {
+                        Mage::getSingleton('core/session', array('name'=>'adminhtml'));
+                        $shippingMethod = Mage::getSingleton('adminhtml/session_quote')->getQuote()->getShippingAddress()->getShippingMethod();
+                }
+
+		$shipCostPreTax = Mage::getSingleton('checkout/session')->getQuote()->getShippingAddress()->getShippingAmount();
+                $shipCostAfterTax = $this->_order->getShippingInclTax();
+
+	        if( strcmp($type, 'virtual') === 0 )
                 {
 			if( $shipping )
 			{
@@ -601,8 +631,8 @@ class Radial_Eb2cFraud_Model_Build_Request
                            ->setShipmentId($orderShippingAddressId);
 		}
 		$subPayloadCostTotals = $subPayloadShipment->getCostTotals();
-        	$subPayloadCostTotals->setAmountBeforeTax($this->_order->getSubtotal())
-        	    ->setAmountAfterTax($this->_order->getGrandTotal())
+        	$subPayloadCostTotals->setAmountBeforeTax($shipCostPreTax)
+        	    ->setAmountAfterTax($shipCostAfterTax)
 		    ->setCurrencyCode($this->_order->getBaseCurrencyCode());
         	$subPayloadShipment->setCostTotals($subPayloadCostTotals);
 		if( strcmp($type, 'virtual') === 0 )
@@ -814,12 +844,35 @@ class Radial_Eb2cFraud_Model_Build_Request
         Radial_Eb2cFraud_Model_Payment_Adapter_IType $paymentAdapterType
     )
     {
+	$paymentAddl = $this->_order->getPayment()->getAdditionalInformation();
+
         $subPayloadCard->setCardHolderName($paymentAdapterType->getExtractCardHolderName())
             ->setPaymentAccountUniqueId($paymentAdapterType->getExtractPaymentAccountUniqueId())
             ->setIsToken($paymentAdapterType->getExtractIsToken())
             ->setPaymentAccountBin($paymentAdapterType->getExtractPaymentAccountBin())
             ->setExpireDate($paymentAdapterType->getExtractExpireDate())
             ->setCardType($paymentAdapterType->getExtractCardType());
+
+	if( isset($paymentAddl['paypal_express_checkout_token']))
+        {
+                $subPayloadCard->setGatewayKey($paymentAddl['paypal_express_checkout_token']);
+        } else {
+                $storeId = Mage::getStoreConfig('radial_core/general/store_id');
+
+		$storeId = Mage::getStoreConfig('radial_core/general/store_id');
+                $clientId = Mage::getStoreConfig('radial_core/general/client_id');
+                $continent = substr($clientId, -2);
+
+                if( strcmp($continent, 'NA') === 0 )
+                {
+                        $subPayloadCard->setOrderAppId('eb2c-'.$storeId.'-'.$continent.'-'.'LVS');
+                } else {
+                        $subPayloadCard->setOrderAppId('eb2c-'.$storeId.'-'.$continent);
+                }
+
+                $subPayloadCard->setPaymentSessionId($this->_order->getIncrementId());
+        }
+
         return $this;
     }
     /**

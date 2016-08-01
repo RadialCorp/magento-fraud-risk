@@ -10,7 +10,7 @@ class Radial_Eb2cFraud_Block_Adminhtml_System_Config_Backend_Purgeretryqueue ext
                 $html = $this->getLayout()->createBlock('adminhtml/widget_button')
                     ->setType('button')
                     ->setClass('scalable')
-                    ->setLabel('Purge Message Retry Queue')
+                    ->setLabel('Purge Fraud Message Retry Queue')
 		    ->setOnClick("setLocation('$url')")
                     ->toHtml();
 

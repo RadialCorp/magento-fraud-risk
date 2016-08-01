@@ -28,7 +28,7 @@ class Radial_Eb2cFraud_Model_Adminhtml_System_Config_Backend_Nummaxretry extends
                                                                          )
                                                                 )->getSize();
 	
-	$publicDisplay = '# of Messages At Max Transmission Retries: '. $objectCollectionSize;
+	$publicDisplay = '# of Fraud Messages At Max Transmission Retries: '. $objectCollectionSize;
 
         $this->setValue($publicDisplay);
         return $this;

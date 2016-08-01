@@ -160,6 +160,7 @@ http://opensource.org/licenses/osl-3.0.php
 	<radial_core>
 		<fraud>
 			<maxretries>3</maxretries>
+			<responsetimeout>20000</responsetimeout>
 		</fraud>
 	</radial_core>
         <radial_eb2cfraud>

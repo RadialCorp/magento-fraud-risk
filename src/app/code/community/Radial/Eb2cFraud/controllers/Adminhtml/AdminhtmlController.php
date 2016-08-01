@@ -16,7 +16,7 @@ class Radial_Eb2cFraud_Adminhtml_AdminhtmlController extends Mage_Adminhtml_Cont
      */ 
     public function messageResetAction()
     {
-        Mage::getSingleton('adminhtml/session')->addSuccess("Successfully Reset Messages at Maximum Transmission");
+        Mage::getSingleton('adminhtml/session')->addSuccess("Successfully Reset Fraud Messages at Maximum Transmission");
 	$maxretries = Mage::helper('radial_eb2cfraud/config')->getMaxRetries();
 
 	$objectCollection = Mage::getModel('radial_core/retryQueue')->getCollection()->setPageSize(100)
@@ -55,7 +55,7 @@ class Radial_Eb2cFraud_Adminhtml_AdminhtmlController extends Mage_Adminhtml_Cont
      */ 
     public function purgeRetryQueueAction()
     {
-        Mage::getSingleton('adminhtml/session')->addSuccess("Successfully Purged Retry Messages Queue");
+        Mage::getSingleton('adminhtml/session')->addSuccess("Successfully Purged Retry Fraud Messages Queue");
 
 	$objectCollection = Mage::getModel('radial_core/retryQueue')->getCollection()->setPageSize(100)
 						->addFieldToFilter(
