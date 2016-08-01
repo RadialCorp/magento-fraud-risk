@@ -81,7 +81,7 @@ http://opensource.org/licenses/osl-3.0.php
 			<observers>
 				<handle_multi_shipping_orders_risk_fraud>
 					<class>radial_eb2cfraud/observer</class>
-					<method>handleCheckoutSubmitAllAfter</method>
+					<method>handleCheckoutSubmitAllAfterMulti</method>
 					<type>singleton</type>
 				</handle_multi_shipping_orders_risk_fraud>
 			</observers>

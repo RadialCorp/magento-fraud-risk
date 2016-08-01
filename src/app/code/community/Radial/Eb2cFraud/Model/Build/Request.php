@@ -606,7 +606,23 @@ class Radial_Eb2cFraud_Model_Build_Request
                 {
                         Mage::getSingleton('core/session', array('name'=>'adminhtml'));
                         $shippingMethod = Mage::getSingleton('adminhtml/session_quote')->getQuote()->getShippingAddress()->getShippingMethod();
-                }
+                } 
+
+		if(!$shippingMethod)
+		{
+			$orderQuote = Mage::getModel('sales/quote')->load($this->_order->getQuoteId());
+
+			$shippingAddresses = $orderQuote->getAllShippingAddresses();
+			$shippingAddressId = $this->_order->getShippingAddress()->getCustomerAddressId();
+
+			foreach( $shippingAddresses as $address )
+			{
+				if( $address->getCustomerAddressId() === $shippingAddressId )
+				{
+					$shippingMethod = $address['shipping_method'];
+				}
+			}
+		}
 
 		$shipCostPreTax = Mage::getSingleton('checkout/session')->getQuote()->getShippingAddress()->getShippingAmount();
                 $shipCostAfterTax = $this->_order->getShippingInclTax();

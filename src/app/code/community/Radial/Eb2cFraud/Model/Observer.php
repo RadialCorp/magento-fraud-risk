@@ -74,34 +74,23 @@ class Radial_Eb2cFraud_Model_Observer extends Radial_Eb2cFraud_Model_Abstract
 	}
 
 	/**
-	 * Handle multi-shipping orders.
+	 * Handle single ship orders.
 	 *
 	 * @param  Varien_Event_Observer
 	 * @return self
 	 */
 	public function handleCheckoutSubmitAllAfter(Varien_Event_Observer $observer)
 	{
+		$addresses = Mage::getSingleton('checkout/session')->getQuote()->getAllShippingAddresses();
+
 		if( !$this->_config->isEnabled())
                 {
       	        	Mage::Log("Risk Service Module Has Been Disabled. Please go to System->Configuration->Payments,TDF, Fraud->Fraud->Enabled and toggled to 'YES'");
       	        	return $this;
                 }
 
-
-		$ordersIds = Mage::getSingleton('core/session')->getOrderIds();
-	
-		if( !empty($ordersIds))
+		if( count($addresses) == 1 )
 		{
-			foreach( $ordersIds as $orderId ) {
-				$order = Mage::getModel('sales/order')->loadByIncrementId($orderId);
-				if ($this->_isValidOrder($order)) {
-					$this->_riskOrder->processRiskOrder($order, $observer, $ordersIds);
-				} else {
-					$logMessage = sprintf('[%s] No sales/order instances was found.', __CLASS__);
-                        		$this->_helper->logWarning($logMessage);
-				}
-			}
-		} else {
 			$order = $observer->getEvent()->getOrder();
 		 	if ($this->_isValidOrder($order)) {
                         	$this->_riskOrder->processRiskOrder($order, $observer);
@@ -112,6 +101,31 @@ class Radial_Eb2cFraud_Model_Observer extends Radial_Eb2cFraud_Model_Abstract
 		}
 		return $this;
 	}
+
+	/**
+	 * Handle multi-ship orders
+	 *
+	 * @param  Varien_Event_Observer
+	 * @return self
+	 */
+	public function handleCheckoutSubmitAllAfterMulti(Varien_Event_Observer $observer)
+        {
+		$orderIds = Mage::getSingleton('core/session')->getOrderIds();
+		if( !empty($orderIds))
+		{
+			foreach( $orderIds as $orderId ) {
+				$order = Mage::getModel('sales/order')->loadByIncrementId($orderId);
+				if($this->_isValidOrder($order)) {
+					$this->_riskOrder->processRiskOrder($order, $observer, $orderIds);
+				} else {
+					$logMessage = sprintf('[%s] No sales/order instances was found.', __CLASS__);
+					$this->_helper->logWarning($logMessage);
+				}
+			}
+		}	
+
+		return $this;
+        }	
 
 	/**
 	  * Log Removed Cart Items
