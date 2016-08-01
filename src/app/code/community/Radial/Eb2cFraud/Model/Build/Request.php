@@ -811,7 +811,7 @@ class Radial_Eb2cFraud_Model_Build_Request
     )
     {
         $items = $this->_order->getAllItems();
-        $itemcount= count($items);
+	$itemList = implode(' ', $items);
 
         $paymentAdapterType = $this->_getPaymentAdapter()->getAdapter();
         $this->_buildPaymentCard($subPayloadPayment->getPaymentCard(), $paymentAdapterType);
@@ -834,7 +834,7 @@ class Radial_Eb2cFraud_Model_Build_Request
             ->setPaymentTransactionID($orderPayment->getId())
 	    ->setIsToken($paymentAdapterType->getExtractIsToken())
 	    ->setAccountID($paymentAdapterType->getExtractPaymentAccountUniqueId())
-            ->setItemListRPH($itemcount);
+            ->setItemListRPH($itemList);
         
         if( $orderPayment->getCcType())
         {
