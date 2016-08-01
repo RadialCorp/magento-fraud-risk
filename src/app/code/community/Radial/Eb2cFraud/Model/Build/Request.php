@@ -482,17 +482,12 @@ class Radial_Eb2cFraud_Model_Build_Request
 		}
 	}
 
-        $this->_buildCustomProperty($subPayloadCustomPropertyGroup, "SPLIT_ORDER", "Y");
-	$this->_buildCustomProperty($subPayloadCustomPropertyGroup, "SPLIT_ORDER_REF_ORD_IDS", implode(',',$this->_orderIds));
-	
-	$admin = Mage::getModel('customer/session')->getAdmin();
-	if($admin->getId() != '') 
+	if( count($this->_orderIds))
 	{
-		$this->_buildCustomProperty($subPayloadCustomPropertyGroup, "OrderSource", "CSR");
-	} else {
-		$this->_buildCustomProperty($subPayloadCustomPropertyGroup, "OrderSource", "WEB");
+        	$this->_buildCustomProperty($subPayloadCustomPropertyGroup, "SPLIT_ORDER", "Y");
+		$this->_buildCustomProperty($subPayloadCustomPropertyGroup, "SPLIT_ORDER_REF_ORD_IDS", implode(',',$this->_orderIds));
 	}
-
+	
         $subPayloadCustomProperties->offsetSet($subPayloadCustomPropertyGroup);
     }
 
