@@ -810,9 +810,11 @@ class Radial_Eb2cFraud_Model_Build_Request
         Mage_Sales_Model_Order_Payment $orderPayment
     )
     {
-        $items = $this->_order->getAllItems();
-	$itemList = implode(' ', $items);
-
+	$itemsCollection = Mage::getModel('sales/order_item')
+                                        ->getCollection()
+                                        ->addAttributeToFilter('order_id', $this->_order->getId())
+                                        ->getAllIds();
+        $itemList = implode(' ', $itemsCollection);
         $paymentAdapterType = $this->_getPaymentAdapter()->getAdapter();
         $this->_buildPaymentCard($subPayloadPayment->getPaymentCard(), $paymentAdapterType);
 
