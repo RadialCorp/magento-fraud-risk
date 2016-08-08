@@ -17,7 +17,7 @@ class Radial_Eb2cFraud_Model_Adminhtml_System_Config_Backend_Totalnumretry exten
 {
     public function _afterLoad()
     {
-	$objectCollectionSize = Mage::getModel('radial_eb2cfraud/retryQueue')->getCollection()
+	$objectCollectionSize = Mage::getModel('radial_core/retryQueue')->getCollection()
 						->addFieldToFilter(
                                                                 array('event_name'),
                                                                          array(
