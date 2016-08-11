@@ -521,7 +521,7 @@ class Radial_Eb2cFraud_Model_Build_Request
          	}
     	}
 
-	if (!filter_var($this->getNewRemoteAddr(), FILTER_VALIDATE_IP) === false)
+	if (!filter_var($remoteAddr, FILTER_VALIDATE_IP) === false)
         {
 		return $remoteAddr;
 	} else {
