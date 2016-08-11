@@ -464,13 +464,8 @@ class Radial_Eb2cFraud_Model_Build_Request
 
 	$subPayloadDeviceInfo->setJSCData($this->_httpHelper->getJavaScriptFraudData());
 	$subPayloadDeviceInfo->setSessionID($sessionId);
-
-	if (!filter_var($this->getNewRemoteAddr(), FILTER_VALIDATE_IP) === false)
-        {
-		$subPayloadDeviceInfo->setDeviceIP($this->getNewRemoteAddr());
-		$subPayloadDeviceInfo->setDeviceHostname(gethostbyaddr($this->getNewRemoteAddr()));
-	}
-
+	$subPayloadDeviceInfo->setDeviceIP($this->getNewRemoteAddr());
+	$subPayloadDeviceInfo->setDeviceHostname(gethostbyaddr($this->getNewRemoteAddr()));
 	$this->_buildHttpHeaders($subPayloadDeviceInfo->getHttpHeaders());
 	$subPayloadDeviceInfo->setUserCookie($this->_httpHelper->getCookiesString());
 
@@ -521,6 +516,7 @@ class Radial_Eb2cFraud_Model_Build_Request
 	$subPayloadCustomProperty->setStringValue($propertyValue);
         $subPayloadCustomPropertyGroup->offsetSet($subPayloadCustomProperty);
     }
+
     private function getNewRemoteAddr()
     {
 	$remoteAddr = Mage::helper('core/http')->getRemoteAddr();
@@ -539,9 +535,14 @@ class Radial_Eb2cFraud_Model_Build_Request
          	} else {
          		$remoteAddr = Mage::helper('core/http')->getRemoteAddr();
          	}
-
-	 	return $remoteAddr;
     	}
+
+	if (!filter_var($remoteAddr, FILTER_VALIDATE_IP) === false)
+        {
+                return $remoteAddr;
+        } else {
+                return '';
+        }
     }
 
     private function ip_is_private($ip)
