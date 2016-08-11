@@ -519,22 +519,16 @@ class Radial_Eb2cFraud_Model_Build_Request
          	} else {
          		$remoteAddr = Mage::helper('core/http')->getRemoteAddr();
          	}
-
-		if (!filter_var($this->getNewRemoteAddr(), FILTER_VALIDATE_IP) === false)
-        	{
-	 		return $remoteAddr;
-		} else {
-			return;
-		}
     	}
 
 	if (!filter_var($this->getNewRemoteAddr(), FILTER_VALIDATE_IP) === false)
         {
 		return $remoteAddr;
 	} else {
-		return;
+		return '';
 	}
     }
+
     private function ip_is_private($ip)
     {
         $privateAddresses = [ '10.0.0.0|10.255.255.255', '172.16.0.0|172.31.255.255', '192.168.0.0|192.168.255.255', '169.254.0.0|169.254.255.255', '127.0.0.0|127.255.255.255' ];
