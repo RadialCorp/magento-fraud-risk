@@ -464,8 +464,13 @@ class Radial_Eb2cFraud_Model_Build_Request
 
 	$subPayloadDeviceInfo->setJSCData($this->_httpHelper->getJavaScriptFraudData());
 	$subPayloadDeviceInfo->setSessionID($sessionId);
-	$subPayloadDeviceInfo->setDeviceIP($this->getNewRemoteAddr());
-	$subPayloadDeviceInfo->setDeviceHostname(gethostbyaddr($this->getNewRemoteAddr()));
+
+	if (!filter_var($this->getNewRemoteAddr(), FILTER_VALIDATE_IP) === false)
+        {
+		$subPayloadDeviceInfo->setDeviceIP($this->getNewRemoteAddr());
+		$subPayloadDeviceInfo->setDeviceHostname(gethostbyaddr($this->getNewRemoteAddr()));
+	}
+
 	$this->_buildHttpHeaders($subPayloadDeviceInfo->getHttpHeaders());
 	$subPayloadDeviceInfo->setUserCookie($this->_httpHelper->getCookiesString());
 
