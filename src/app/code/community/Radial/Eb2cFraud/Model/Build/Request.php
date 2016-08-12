@@ -775,10 +775,11 @@ class Radial_Eb2cFraud_Model_Build_Request
         Mage_Core_Model_Abstract $orderItem
     )
     {
-	$lineItemAmount = (int)$orderItem->getQtyOrdered() * $orderItem->getPrice();
+	$unitCost = $orderItem->getParentItem()? $orderItem->getParentItem()->getPrice() : $orderItem-> getPrice();
+	$lineItemAmount = (int)$orderItem->getQtyOrdered() * $unitCost;
 
 	$subPayloadLineItem->setLineTotalAmount($lineItemAmount)
-			   ->setUnitCost($orderItem->getPrice())
+			   ->setUnitCost($unitCost)
 			   ->setQuantity((int) $orderItem->getQtyOrdered())
 			   ->setProductName($orderItem->getName())
 			   ->setDescription($orderItem->getName())
