@@ -160,10 +160,9 @@ class Radial_Eb2cFraud_Model_Risk_Order
                         Mage::log($logMessage, Zend_Log::WARN);
                         Mage::logException($e);
 
-			$fraudEmailA = explode(',', $this->_config->getFraudEmail());
- 
-			if( !empty($fraudEmailA) )
+			if( $this->_config->getFraudEmail())
 			{
+				$fraudEmailA = explode(',', $this->_config->getFraudEmail());
 				foreach( $fraudEmailA as $fraudEmail )
 				{
 					$fraudName = Mage::app()->getStore()->getName() . ' - ' . 'Fraud Admin';
@@ -379,10 +378,9 @@ class Radial_Eb2cFraud_Model_Risk_Order
                                         	 		$logMessage = sprintf('[%s] Error Transmitting Message (MAX RETRIES) - Body: %s', __CLASS__, $e->getMessage());
                                         	 		Mage::log($logMessage, Zend_Log::ERR);
 
-                                				$fraudEmailA = explode(',', $this->_config->getFraudEmail());
-
-                        					if( !empty($fraudEmailA) )
+                        					if($this->_config->getFraudEmail())
                         					{
+									$fraudEmailA = explode(',', $this->_config->getFraudEmail());
                                 					foreach( $fraudEmailA as $fraudEmail )
                                 					{
 										$fraudName = Mage::app()->getStore()->getName() . ' - ' . 'Fraud Admin';
@@ -426,10 +424,9 @@ class Radial_Eb2cFraud_Model_Risk_Order
 				 $logMessage = sprintf('[%s] Error JOB Retransmission: %s', __CLASS__, $e->getMessage());
                         	 Mage::log($logMessage, Zend_Log::ERR);
 
-                        	 $fraudEmailA = explode(',', $this->_config->getFraudEmail());
-	
-        	                 if( !empty($fraudEmailA) )
+        	                 if( $this->_config->getFraudEmail())
         	                 {
+					$fraudEmailA = explode(',', $this->_config->getFraudEmail());
                 	                foreach( $fraudEmailA as $fraudEmail )
                 	                {
 						$fraudName = Mage::app()->getStore()->getName() . ' - ' . 'Fraud Admin';
