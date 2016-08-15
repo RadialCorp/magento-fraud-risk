@@ -91,7 +91,8 @@ class Radial_Eb2cFraud_Model_Observer extends Radial_Eb2cFraud_Model_Abstract
 
                 if( !$quote->getIsMultiShipping())
                 {
-                        $order = $observer->getEvent()->getOrder();
+                        $orderI = $observer->getEvent()->getOrder()->getIncrementId();
+			$order = Mage::getModel('sales/order')->loadByIncrementId($orderI);
                         if ($this->_isValidOrder($order)) {
                                 $this->_riskOrder->processRiskOrder($order, $observer);
                         } else {
