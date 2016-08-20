@@ -38,6 +38,13 @@ class Radial_Eb2cFraud_Model_Payment_Adapter_Default
 
 		$transArray = array();
 
+		if( isset($additionalInformation['response_code']) && (strcmp($additionalInformation['response_code'], 'AP01') === 0 || strcmp($additionalInformation['response_code'], 'APPROVED') === 0))
+		{
+			$transArray[] = array('type' => 'primary', 'response' => 'Y');
+		} else {
+			$transArray[] = array('type' => 'primary', 'response' => 'N');
+		}
+
                 if( isset($additionalInformation['avs_response_code']))
                 {
                         $transArray[] = array('type' => 'avsZip', 'response' => $additionalInformation['avs_response_code']);
