@@ -925,18 +925,13 @@ class Radial_Eb2cFraud_Model_Build_Request
     {
         $payment = $this->_order->getPayment();
         $paymentAdditional = $payment->getAdditionalInformation(); 
-	if( !isset($paymentAdditional['response_code']) )
-	{
-		$subPayloadAuthorization->setDecline("true");
+	if( isset($paymentAdditional['bank_authorization_code']) && $paymentAdditional['bank_authorization_code'])
+        {
+		$subPayloadAuthorization->setDecline("false");
+		$subPayloadAuthorization->setCode($paymentAdditional['bank_authorization_code']);
 	} else {
-		if( strcmp($paymentAdditional['response_code'], "APPROVED") === 0 )
-        	{
-			$subPayloadAuthorization->setDecline("false");
-			$subPayloadAuthorization->setCode($paymentAdditional['bank_authorization_code']);
-		} else {
-			$subPayloadAuthorization->setDecline("true");
-        	}
-	}	 
+		$subPayloadAuthorization->setDecline("true");
+        }
         return $this;
     }
     /**
