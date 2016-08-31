@@ -464,8 +464,8 @@ class Radial_Eb2cFraud_Model_Build_Request
 
 	$subPayloadDeviceInfo->setJSCData($this->_httpHelper->getJavaScriptFraudData());
 	$subPayloadDeviceInfo->setSessionID($sessionId);
-	$subPayloadDeviceInfo->setDeviceIP($this->getNewRemoteAddr());
-	$subPayloadDeviceInfo->setDeviceHostname(gethostbyaddr($this->getNewRemoteAddr()));
+	$subPayloadDeviceInfo->setDeviceIP($this->_httpHelper->getRemoteAddr());
+	$subPayloadDeviceInfo->setDeviceHostname($this->_httpHelper->getRemoteHost());
 	$this->_buildHttpHeaders($subPayloadDeviceInfo->getHttpHeaders());
 	$subPayloadDeviceInfo->setUserCookie($this->_httpHelper->getCookiesString());
 
@@ -515,56 +515,6 @@ class Radial_Eb2cFraud_Model_Build_Request
         $subPayloadCustomProperty->setName($propertyName);
 	$subPayloadCustomProperty->setStringValue($propertyValue);
         $subPayloadCustomPropertyGroup->offsetSet($subPayloadCustomProperty);
-    }
-
-    private function getNewRemoteAddr()
-    {
-	$remoteAddr = Mage::helper('core/http')->getRemoteAddr();
-
-	if( $this->ip_is_private($remoteAddr))
-	{
-		if(isset($_SERVER['HTTP_X_FORWARDED_FOR']))
-        	{
-        		$ip_array=array_values(array_filter(explode(',',$_SERVER['HTTP_X_FORWARDED_FOR'])));
-                	$remoteAddr = $ip_array[0];
-
-                	if(!$remoteAddr)
-                	{
-                		$remoteAddr = Mage::helper('core/http')->getRemoteAddr();
-                	}
-         	} else {
-         		$remoteAddr = Mage::helper('core/http')->getRemoteAddr();
-         	}
-    	}
-
-	if (!filter_var($remoteAddr, FILTER_VALIDATE_IP) === false)
-        {
-                return $remoteAddr;
-        } else {
-                return '';
-        }
-    }
-
-    private function ip_is_private($ip)
-    {
-        $privateAddresses = [ '10.0.0.0|10.255.255.255', '172.16.0.0|172.31.255.255', '192.168.0.0|192.168.255.255', '169.254.0.0|169.254.255.255', '127.0.0.0|127.255.255.255' ];
-
-        $long_ip = ip2long($ip);
-        if($long_ip != -1) 
-	{
-            foreach($privateAddresses as $pri_addr)
-            {
-                list($start, $end) = explode('|', $pri_addr);
-
-                // IF IS PRIVATE
-                if($long_ip >= ip2long($start) && $long_ip <= ip2long($end))
-		{
-                	return true;
-		}
-            }
-    	}
-
-	return false;
     }
 
     /**
