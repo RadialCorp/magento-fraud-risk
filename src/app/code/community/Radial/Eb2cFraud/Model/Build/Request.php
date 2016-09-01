@@ -42,6 +42,8 @@ class Radial_Eb2cFraud_Model_Build_Request
     protected $_shippingHelper; 
     /** order id array **/
     protected $_orderIds;
+    /** Radial_Core_Helper_Http */
+    protected $_httpCoreHelper;
 
     /**
      * @param array $initParams Must have this key:
@@ -52,6 +54,7 @@ class Radial_Eb2cFraud_Model_Build_Request
      *                          - 'product' => Mage_Catalog_Model_Product
      *				- 'config'  => Radial_Eb2cFraud_Helper_config
      *				- 'shippinghelper' => Radial_Core_Helper_Shipping
+     *                          - 'http_core_helper' => Raidal_Core_Helper_Http
      */
     public function __construct(array $initParams=array())
     {
@@ -60,7 +63,7 @@ class Radial_Eb2cFraud_Model_Build_Request
 		$this->_orderIds = $initParams['order_ids'];
 	}
 
-        list($this->_request, $this->_order, $this->_quote, $this->_helper, $this->_httpHelper, $this->_product, $this->_config, $this->_service, $this->_shippingHelper) = $this->_checkTypes(
+        list($this->_request, $this->_order, $this->_quote, $this->_helper, $this->_httpHelper, $this->_product, $this->_config, $this->_service, $this->_shippingHelper, $this->_httpCoreHelper) = $this->_checkTypes(
             $this->_nullCoalesce($initParams, 'request', $this->_getNewSdkInstance('Radial_RiskService_Sdk_Request')),
             $this->_nullCoalesce($initParams, 'order', $initParams['order']),
             $this->_nullCoalesce($initParams, 'quote', Mage::getModel('sales/quote')),
@@ -69,7 +72,8 @@ class Radial_Eb2cFraud_Model_Build_Request
             $this->_nullCoalesce($initParams, 'product', Mage::getModel('catalog/product')),
 	    $this->_nullCoalesce($initParams, 'config', Mage::helper('radial_eb2cfraud/config')),
 	    $this->_nullCoalesce($initParams, 'service', Mage::getModel('radial_eb2cfraud/risk_service')),
-	    $this->_nullCoalesce($initParams, 'shipping_helper', Mage::helper('radial_core/shipping'))
+	    $this->_nullCoalesce($initParams, 'shipping_helper', Mage::helper('radial_core/shipping')),
+	    $this->_nullCoalesce($initParams, 'http_core_helper', Mage::helper('radial_core/http'))
         );
     }
     /**
@@ -84,6 +88,7 @@ class Radial_Eb2cFraud_Model_Build_Request
      * @param  Radial_Eb2cFraud_Helper_Config
      * @param  Radial_Eb2cFraud_Model_Risk_Service
      * @param  Radial_Core_Helper_Shipping
+     * @param  Radial_Core_Helper_Http
      * @return array
      */
     protected function _checkTypes(
@@ -95,9 +100,10 @@ class Radial_Eb2cFraud_Model_Build_Request
         Mage_Catalog_Model_Product $product,
 	Radial_Eb2cFraud_Helper_Config $config,
 	Radial_Eb2cFraud_Model_Risk_Service $service,
-	Radial_Core_Helper_Shipping $shippingHelper
+	Radial_Core_Helper_Shipping $shippingHelper,
+	Radial_Core_Helper_Http $httpCoreHelper
     ) {
-        return array($request, $order, $quote, $helper, $httpHelper, $product, $config, $service, $shippingHelper);
+        return array($request, $order, $quote, $helper, $httpHelper, $product, $config, $service, $shippingHelper, $httpCoreHelper);
     }
     public function build()
     {
@@ -443,8 +449,8 @@ class Radial_Eb2cFraud_Model_Build_Request
 	$sessionId = Mage::getSingleton('core/session')->getEncryptedSessionId();
 	$subPayloadDeviceInfo->setJSCData($this->_httpHelper->getJavaScriptFraudData());
 	$subPayloadDeviceInfo->setSessionID($sessionId);
-	$subPayloadDeviceInfo->setDeviceIP($this->_httpHelper->getRemoteAddr());
-	$subPayloadDeviceInfo->setDeviceHostname($this->_httpHelper->getRemoteHost());
+	$subPayloadDeviceInfo->setDeviceIP($this->_httpCoreHelper->getRemoteAddr());
+	$subPayloadDeviceInfo->setDeviceHostname($this->_httpCoreHelper->getRemoteHost());
 	$this->_buildHttpHeaders($subPayloadDeviceInfo->getHttpHeaders());
 	$subPayloadDeviceInfo->setUserCookie($this->_httpHelper->getCookiesString());
         return $this;
