@@ -202,14 +202,11 @@ http://opensource.org/licenses/osl-3.0.php
                     <payflow_link>radial_eb2cfraud/payment_adapter_default</payflow_link>
                     <hosted_pro>radial_eb2cfraud/payment_adapter_default</hosted_pro>
                     <paypal_express>radial_eb2cfraud/payment_adapter_paypal_express</paypal_express>
-		    <radial_paypal_express>radial_eb2cfraud/payment_adapter_paypal_express</radial_paypal_express>
                     <verisign>radial_eb2cfraud/payment_adapter_default</verisign>
                     <paypaluk_direct>radial_eb2cfraud/payment_adapter_default</paypaluk_direct>
                     <paypaluk_express>radial_eb2cfraud/payment_adapter_default</paypaluk_express>
                     <paypal_standard>radial_eb2cfraud/payment_adapter_default</paypal_standard>
-		    <radial_paypal_standard>radial_eb2cfraud/payment_adapter_paypal_express</radial_paypal_standard>
                     <paypal_direct>radial_eb2cfraud/payment_adapter_default</paypal_direct>
-		    <radial_paypal_direct>radial_eb2cfraud/payment_adapter_paypal_express</radial_paypal_direct>
                     <paypal_express_bml>radial_eb2cfraud/payment_adapter_default</paypal_express_bml>
                     <pbridge>radial_eb2cfraud/payment_adapter_pbridge</pbridge>
                     <pbridge_authorizenet>radial_eb2cfraud/payment_adapter_pbridge</pbridge_authorizenet>
@@ -232,6 +229,8 @@ http://opensource.org/licenses/osl-3.0.php
                     <pbridge_payone_debit>radial_eb2cfraud/payment_adapter_pbridge</pbridge_payone_debit>
                     <ogone>radial_eb2cfraud/payment_adapter_default</ogone>
                     <purchaseorder>radial_eb2cfraud/payment_adapter_purchase_order</purchaseorder>
+		    <radial_paypal_express>radial_eb2cfraud/payment_adapter_paypal_radialexpress</radial_paypal_express>
+		    <radial_creditcard>radial_eb2cfraud/payment_adapter_radialcreditcard</radial_creditcard>
                 </payment_adapter_map>
 		<response_codes>
 			<Accept>risk_accept</Accept>
