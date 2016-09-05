@@ -110,14 +110,14 @@ http://opensource.org/licenses/osl-3.0.php
                                 </radial_eb2cfraud_count_reject>
                         </observers>
                 </radial_creditcard_auth_request_send_before>
-		<sales_order_save_after>
+		<sales_order_save_before>
 			<observers>
 				<radial_eb2cfraud_orderconfirmrequest>
 					<class>radial_eb2cfraud/risk_order</class>
 					<method>processOrderConfirmationRequest</method>
 				</radial_eb2cfraud_orderconfirmrequest>
 			</observers>
-		</sales_order_save_after>
+		</sales_order_save_before>
 	</events>
 	<template>
 		<email>

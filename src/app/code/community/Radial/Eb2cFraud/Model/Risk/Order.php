@@ -282,10 +282,11 @@ class Radial_Eb2cFraud_Model_Risk_Order
         {
                 $order = $observer->getOrder();
 		$orderNull = Mage::getModel('sales/order');
+		$orderBefore = Mage::getModel('sales/order')->load($order->getId());
 
                 $request = $this->_getNewOCREmptyRequest();
 
-		if( $order->getState() != Mage_Sales_Model_Order::STATE_NEW && $order->getState() != 'pending' )
+		if( $order->getState() != Mage_Sales_Model_Order::STATE_NEW && $order->getState() != 'pending' && $orderBefore->getState() != Mage_Sales_Model_Order::STATE_CANCELED )
 		{
 			$allPending = true;
 			$collectionReturnSize = Mage::getResourceModel('sales/order_creditmemo_collection')
