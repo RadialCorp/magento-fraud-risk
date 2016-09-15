@@ -22,12 +22,9 @@ class Radial_Eb2cFraud_Adminhtml_AdminhtmlController extends Mage_Adminhtml_Cont
 	$objectCollection = Mage::getModel('radial_core/retryQueue')->getCollection()->setPageSize(100)
 					->addFieldToFilter('delivery_status', $maxretries)
 					->addFieldToFilter(
-                                                   array('event_name'),
-                                                        array(
-                                                                array('eq'=>'risk_assessment_request'),
-                                                                array('eq'=>'order_confirmation_request')
-                                                        )
-                                        );
+                                        	array('event_name', 'event_name'),
+                                                        array(array('eq' => 'risk_assessment_request'), array('eq' => 'order_confirmation_request'))
+					);
 
         $pages = $objectCollection->getLastPageNumber();
         $currentPage = 1;
@@ -59,12 +56,9 @@ class Radial_Eb2cFraud_Adminhtml_AdminhtmlController extends Mage_Adminhtml_Cont
 
 	$objectCollection = Mage::getModel('radial_core/retryQueue')->getCollection()->setPageSize(100)
 						->addFieldToFilter(
-                                                                array('event_name'),
-                                                                        array(
-                                                                                  array('eq'=>'risk_assessment_request'),
-                                                                                  array('eq'=>'order_confirmation_request')
-                                                                        )
-                                                );
+                                                	array('event_name', 'event_name'),
+                                                        	array(array('eq' => 'risk_assessment_request'), array('eq' => 'order_confirmation_request'))
+						);
         $pages = $objectCollection->getLastPageNumber();
         $currentPage = 1;
 
