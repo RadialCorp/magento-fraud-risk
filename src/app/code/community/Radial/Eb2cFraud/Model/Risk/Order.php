@@ -304,7 +304,7 @@ class Radial_Eb2cFraud_Model_Risk_Order
 				}
 			}
  
-			if( !$allPending || $order->hasShipments() || $collectionReturnSize > 0 || $order->getState() === Mage_Sales_Model_Order::STATE_COMPLETE || $order->getState() === Mage_Sales_Model_Order::STATE_CLOSED || $order->getState() === Mage_Sales_Model_Order::STATE_CANCELED || strcmp($orderBefore->getState(), 'ready_ship') === 0)
+			if( !$allPending || $order->hasShipments() || $collectionReturnSize > 0 || $order->getState() === Mage_Sales_Model_Order::STATE_COMPLETE || $order->getState() === Mage_Sales_Model_Order::STATE_CLOSED || $order->getState() === Mage_Sales_Model_Order::STATE_CANCELED )
 			{
 				try
 				{
