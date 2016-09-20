@@ -183,6 +183,18 @@ class Radial_Eb2cFraud_Model_Observer extends Radial_Eb2cFraud_Model_Abstract
 
             if( $order->getId() )
             {
+		$riskResponseCode = $order->getPayment()->getAdditionalInformation()->getRiskResponseCode();
+
+		if( strcmp($riskResponseCode, 'DECLR') === 0 )
+		{
+			$order->cancel();
+			$order->setState($this->_config->getOrderStateForResponseCode($responseCode), $this->_config->getOrderStatusForResponseCode($responseCode), $comment, false);
+			$order->addStatusHistoryComment("Order Auto-Canceled by Webstore: Card Reported Stolen");
+			$order->save();
+			
+			return $this;
+		}
+
 		$status = $order->getStatus();
 		$state = $order->getState();
 
