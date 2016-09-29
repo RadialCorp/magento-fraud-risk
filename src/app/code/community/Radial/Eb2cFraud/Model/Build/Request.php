@@ -453,6 +453,8 @@ class Radial_Eb2cFraud_Model_Build_Request
 	$orderBillingAddress = $this->_order->getBillingAddress();
         $orderPayment = $this->_order->getPayment();
 
+	Mage::Log("Payment OBJ: ". print_r($orderPayment->debug(), true));
+
         if ($orderBillingAddress && $orderPayment) {
             $this->_buildPayment($subPayloadTotalCost->getFormOfPayment(), $orderBillingAddress, $orderPayment);
         }
@@ -795,13 +797,16 @@ class Radial_Eb2cFraud_Model_Build_Request
             ->setPaymentTransactionDate($this->_helper->getNewDateTime($this->_getPaymentTransactionDate()))
             ->setCurrencyCode($this->_order->getBaseCurrencyCode())
             ->setAmount($orderPayment->getAmountAuthorized())
-            ->setPaymentTransactionTypeCode($this->_config->getTenderTypeForCcType($orderPayment->getCcType() ? $orderPayment->getCcType() : $orderPayment->getMethod()))
+            ->setPaymentTransactionTypeCode($paymentAdapterType->getExtractCardType())
             ->setPaymentTransactionID($orderPayment->getId())
 	    ->setIsToken($paymentAdapterType->getExtractIsToken())
 	    ->setAccountID($paymentAdapterType->getExtractPaymentAccountUniqueId())
             ->setItemListRPH($itemList);
-        
-        if( $orderPayment->getCcType())
+       
+	$ccType = $this->_config->getTenderTypeForCcType($orderPayment->getCcType() ? $orderPayment->getCcType() : $orderPayment->getMethod());
+	$ccTypeArray = array( "AM", "VC", "MC", "DC" );
+
+        if( in_array( $ccType, $ccTypeArray ) && strcmp($paymentAdapterType->getExtractCardType(), "PY") !== 0 && strcmp($paymentAdapterType->getExtractCardType(), "OTHER") !== 0 && strcmp($paymentAdapterType->getExtractCardType(), "CASH") !== 0 && strcmp($paymentAdapterType->getExtractCardType(), "CASH") !== 0 )
         {
             $subPayloadPayment->setTenderClass("CreditCard");
         } else {
