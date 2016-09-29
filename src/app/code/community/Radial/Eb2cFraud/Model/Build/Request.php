@@ -737,7 +737,13 @@ class Radial_Eb2cFraud_Model_Build_Request
         Mage_Core_Model_Abstract $orderItem
     )
     {
-	$unitCost = $orderItem->getParentItem()? $orderItem->getParentItem()->getPrice() : $orderItem-> getPrice();
+	if( $orderItem->getParentItem() && $orderItem->getParentItem()->getTypeId() == Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE )
+        {
+                $unitCost = $orderItem->getParentItem()->getPrice();
+        } else {
+                $unitCost = $orderItem->getPrice();
+        }
+
 	$lineItemAmount = (int)$orderItem->getQtyOrdered() * $unitCost;
 	$itemId="";
 
