@@ -129,12 +129,27 @@ class Radial_Eb2cFraud_Model_Build_OCRequest
 	foreach ($this->_order->getAllItems() as $orderItem) {
             if( $orderItem->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_SIMPLE || $orderItem->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_VIRTUAL )
             {
-		$qtyCanceled = $orderItem->getQtyCanceled();
-                $qtyReturned = $orderItem->getQtyReturned();
-		$qtyRefunded = $orderItem->getQtyRefunded();
-		$qtyInvoiced = $orderItem->getQtyInvoiced();
-		$qtyShipped = $orderItem->getQtyShipped();
-		$qtyOrdered = $orderItem->getQtyOrdered();
+		if( $orderItem->getParentItemId() )
+		{
+			$orderItemP = $this->_order->getItemsCollection()
+    						->addAttributeToSelect('*')
+    						->addAttributeToFilter('item_id', array('eq'=>$orderItem->getParentItemId()))
+    						->getFirstItem();
+
+			$qtyCanceled = $orderItemP->getQtyCanceled();
+                        $qtyReturned = $orderItemP->getQtyReturned();
+                        $qtyRefunded = $orderItemP->getQtyRefunded();
+                        $qtyInvoiced = $orderItemP->getQtyInvoiced();
+                        $qtyShipped = $orderItemP->getQtyShipped();
+                        $qtyOrdered = $orderItemP->getQtyOrdered();
+		} else {
+			$qtyCanceled = $orderItem->getQtyCanceled();
+                	$qtyReturned = $orderItem->getQtyReturned();
+			$qtyRefunded = $orderItem->getQtyRefunded();
+			$qtyInvoiced = $orderItem->getQtyInvoiced();
+			$qtyShipped = $orderItem->getQtyShipped();
+			$qtyOrdered = $orderItem->getQtyOrdered();
+		}
 
 		$shippedItems += $qtyShipped;
 		$orderedItems += $qtyOrdered;
@@ -188,7 +203,7 @@ class Radial_Eb2cFraud_Model_Build_OCRequest
 	$this->_buildLineDetails($subPayloadOrder->getLineDetails());
 
 	$collectionReturnSize = Mage::getResourceModel('sales/order_creditmemo_collection')
-                                                  ->addAttributeToFilter('increment_id', $this->_order->getOrderId())->getSize();
+                                                  ->addAttributeToFilter('order_id', $this->_order->getId())->getSize();
 
 	if( $collectionReturnSize > 0 || $this->_order->getState() === Mage_Sales_Model_Order::STATE_CLOSED )
 	{
@@ -218,7 +233,7 @@ class Radial_Eb2cFraud_Model_Build_OCRequest
 	if( strcmp($attributeName, "RefundedAmount") === 0 )
 	{
 		$collectionReturn = Mage::getResourceModel('sales/order_creditmemo_collection')
-                                                  ->addAttributeToFilter('increment_id', $this->_order->getOrderId());
+                                                  ->addAttributeToFilter('order_id', $this->_order->getId());
 		$collectionReturnSize = $collectionReturn->getSize();
 
 		if( $collectionReturnSize > 0)
@@ -252,11 +267,27 @@ class Radial_Eb2cFraud_Model_Build_OCRequest
 	    if( $orderItem->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_SIMPLE || $orderItem->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_VIRTUAL )
 	    {
 	    	$quaduple = array();
-	    	$qtyShipped = $orderItem->getQtyShipped(); 
-	    	$qtyOrdered = $orderItem->getQtyOrdered();
-	    	$qtyCanceled = $orderItem->getQtyCanceled();
-	    	$qtyReturned = $orderItem->getQtyReturned(); 
-		$qtyRefunded = $orderItem->getQtyRefunded();
+
+		if( $orderItem->getParentItemId() )
+		{
+			$orderItemP = $this->_order->getItemsCollection()
+                                                ->addAttributeToSelect('*')
+                                                ->addAttributeToFilter('item_id', array('eq'=>$orderItem->getParentItemId()))
+                                                ->getFirstItem();
+
+                        $qtyCanceled = $orderItemP->getQtyCanceled();
+                        $qtyReturned = $orderItemP->getQtyReturned();
+                        $qtyRefunded = $orderItemP->getQtyRefunded();
+                        $qtyInvoiced = $orderItemP->getQtyInvoiced();
+                        $qtyShipped = $orderItemP->getQtyShipped();
+                        $qtyOrdered = $orderItemP->getQtyOrdered();
+		} else {
+			$qtyShipped = $orderItem->getQtyShipped();
+                	$qtyOrdered = $orderItem->getQtyOrdered();
+                	$qtyCanceled = $orderItem->getQtyCanceled();
+                	$qtyReturned = $orderItem->getQtyReturned();
+                	$qtyRefunded = $orderItem->getQtyRefunded();
+		}
 
 	    	foreach($this->_order->getShipmentsCollection() as $shipment){
             		foreach ($shipment->getAllItems() as $product){
