@@ -781,8 +781,11 @@ class Radial_Eb2cFraud_Model_Build_Request
         $paymentAdapterType = $this->_getPaymentAdapter()->getAdapter();
         $this->_buildPaymentCard($subPayloadPayment->getPaymentCard(), $paymentAdapterType);
 
-	if( $orderPayment->getCcType())
-	{
+	$ccType = $this->_config->getTenderTypeForCcType($orderPayment->getCcType() ? $orderPayment->getCcType() : $orderPayment->getMethod());
+        $ccTypeArray = array( "AM", "VC", "MC", "DC" );
+
+	if( in_array( $ccType, $ccTypeArray ) && strcmp($paymentAdapterType->getExtractCardType(), "PY") !== 0 && strcmp($paymentAdapterType->getExtractCardType(), "OTHER") !== 0 && strcmp($paymentAdapterType->getExtractCardType(), "CASH") !== 0 && strcmp($paymentAdapterType->getExtractCardType(), "CASH") !== 0 )
+        {
 		$this->_buildAuthorization($subPayloadPayment->getAuthorization());
 	}            
 
@@ -801,9 +804,6 @@ class Radial_Eb2cFraud_Model_Build_Request
 	    ->setAccountID($paymentAdapterType->getExtractPaymentAccountUniqueId())
             ->setItemListRPH($itemList);
        
-	$ccType = $this->_config->getTenderTypeForCcType($orderPayment->getCcType() ? $orderPayment->getCcType() : $orderPayment->getMethod());
-	$ccTypeArray = array( "AM", "VC", "MC", "DC" );
-
         if( in_array( $ccType, $ccTypeArray ) && strcmp($paymentAdapterType->getExtractCardType(), "PY") !== 0 && strcmp($paymentAdapterType->getExtractCardType(), "OTHER") !== 0 && strcmp($paymentAdapterType->getExtractCardType(), "CASH") !== 0 && strcmp($paymentAdapterType->getExtractCardType(), "CASH") !== 0 )
         {
             $subPayloadPayment->setTenderClass("CreditCard");
