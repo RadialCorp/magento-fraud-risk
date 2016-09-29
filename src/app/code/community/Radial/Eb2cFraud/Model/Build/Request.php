@@ -453,8 +453,6 @@ class Radial_Eb2cFraud_Model_Build_Request
 	$orderBillingAddress = $this->_order->getBillingAddress();
         $orderPayment = $this->_order->getPayment();
 
-	Mage::Log("Payment OBJ: ". print_r($orderPayment->debug(), true));
-
         if ($orderBillingAddress && $orderPayment) {
             $this->_buildPayment($subPayloadTotalCost->getFormOfPayment(), $orderBillingAddress, $orderPayment);
         }
