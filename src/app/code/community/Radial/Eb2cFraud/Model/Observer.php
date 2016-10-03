@@ -205,7 +205,7 @@ class Radial_Eb2cFraud_Model_Observer extends Radial_Eb2cFraud_Model_Abstract
 			if( $this->_config->getOrderStateForResponseCode($responseCode) === Mage_Sales_Model_Order::STATE_CANCELED )
 			{
 				$order->cancel();
-				$order->setState($this->_config->getOrderStateForResponseCode($responseCode), $this->_config->getOrderStatusForResponseCode($responseCode), $comment, false);
+				$order->addStatusHistoryComment($comment);
 			} else {
                 		$order->setState($this->_config->getOrderStateForResponseCode($responseCode), $this->_config->getOrderStatusForResponseCode($responseCode), $comment, false);
 			}
