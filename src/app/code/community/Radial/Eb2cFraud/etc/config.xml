@@ -305,7 +305,8 @@ http://opensource.org/licenses/osl-3.0.php
 	        <radial_eb2cfraud_retry_sendevent>
 	            <schedule><cron_expr>* * * * *</cron_expr></schedule>
 	            <run><model>radial_eb2cfraud/risk_order::sendEvent</model></run>
-	        </radial_eb2cfraud_retry_sendevent>
+	            <groups>radial</groups>
+		</radial_eb2cfraud_retry_sendevent>
 	    </jobs>
      </crontab>
      <admin>
