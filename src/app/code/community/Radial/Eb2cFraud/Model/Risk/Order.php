@@ -284,6 +284,12 @@ class Radial_Eb2cFraud_Model_Risk_Order
 		$orderNull = Mage::getModel('sales/order');
 		$orderBefore = Mage::getModel('sales/order')->load($order->getId());
 
+		if( !$this->_config->isEnabled($order->getStoreId()))
+                {        
+                        Mage::Log("For Order ID: ". $order->getIncrementId() . " Risk Service Module Has Been Disabled. Please go to System->Configuration->Payments,TDF, Fraud->Fraud->Enabled and toggled to 'YES'");
+                	return $this;
+		}
+
                 $request = $this->_getNewOCREmptyRequest();
 
 		if( $order->getState() != Mage_Sales_Model_Order::STATE_NEW && $order->getState() != 'pending' && $orderBefore->getState() != Mage_Sales_Model_Order::STATE_CANCELED && $order->getState() && $order->getStatus() )

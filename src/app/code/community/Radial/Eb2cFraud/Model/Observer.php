@@ -81,18 +81,19 @@ class Radial_Eb2cFraud_Model_Observer extends Radial_Eb2cFraud_Model_Abstract
 	 */
 	public function handleCheckoutSubmitAllAfter(Varien_Event_Observer $observer)
 	{
-                if( !$this->_config->isEnabled())
-                {
-                        Mage::Log("Risk Service Module Has Been Disabled. Please go to System->Configuration->Payments,TDF, Fraud->Fraud->Enabled and toggled to 'YES'");
-                        return $this;
-                }
-
                 $quote = $observer->getEvent()->getQuote();
 
                 if( !$quote->getIsMultiShipping())
                 {
                         $orderI = $observer->getEvent()->getOrder()->getIncrementId();
 			$order = Mage::getModel('sales/order')->loadByIncrementId($orderI);
+
+			if( !$this->_config->isEnabled($order->getStoreId()))
+                       	{
+                       	        Mage::Log("For Order ID: ". $order->getIncrementId() . " Risk Service Module Has Been Disabled. Please go to System->Configuration->Payments,TDF, Fraud->Fraud->Enabled and toggled to 'YES'");
+				return $this;
+			}
+
                         if ($this->_isValidOrder($order)) {
                                 $this->_riskOrder->processRiskOrder($order, $observer);
                         } else {
@@ -104,6 +105,13 @@ class Radial_Eb2cFraud_Model_Observer extends Radial_Eb2cFraud_Model_Abstract
                         foreach( $orderIds as $orderId )
                         {
                                 $order = Mage::getModel('sales/order')->loadByIncrementId($orderId);
+
+				if( !$this->_config->isEnabled($order->getStoreId()))
+                        	{       
+                                	Mage::Log("For Order ID: ". $order->getIncrementId() . " Risk Service Module Has Been Disabled. Please go to System->Configuration->Payments,TDF, Fraud->Fraud->Enabled and toggled to 'YES'");
+                                	continue;
+                        	}  
+
                                 if($this->_isValidOrder($order)) {
                                         $this->_riskOrder->processRiskOrder($order, $observer, $orderIds);
                                 } else {
@@ -150,12 +158,6 @@ class Radial_Eb2cFraud_Model_Observer extends Radial_Eb2cFraud_Model_Abstract
 
     	public function updateOrderStatus(Varien_Event_Observer $observer)
     	{
-	    if( !$this->_config->isEnabled())
-            {
-                Mage::Log("Risk Service Module Has Been Disabled. Please go to System->Configuration->Payments,TDF, Fraud->Fraud->Enabled and toggled to 'YES'");
-                return $this;
-            }
-
             $event = $observer->getEvent()->getPayload();
 
             $orderId = $event->getCustomerOrderId();
@@ -183,6 +185,12 @@ class Radial_Eb2cFraud_Model_Observer extends Radial_Eb2cFraud_Model_Abstract
 
             if( $order->getId() )
             {
+		if( !$this->_config->isEnabled($order->getStoreId()))
+                {       
+                	Mage::Log("For Order ID: ". $order->getIncrementId() . " Risk Service Module Has Been Disabled. Please go to System->Configuration->Payments,TDF, Fraud->Fraud->Enabled and toggled to 'YES'");
+			return $this;
+		}  
+
 		$riskResponseCode = $order->getPayment()->getAdditionalInformation()->getRiskResponseCode();
 
 		if( strcmp($riskResponseCode, 'DECLR') === 0 )
