@@ -439,7 +439,9 @@ class Radial_Eb2cFraud_Model_Build_Request
     protected function _buildTotalCost(Radial_RiskService_Sdk_ITotal $subPayloadTotalCost)
     {
         $subPayloadCostTotals = $subPayloadTotalCost->getCostTotals();
-        $subPayloadCostTotals->setAmountBeforeTax($this->_order->getSubtotal())
+	$amountBeforeTax = $this->_order->getGrandTotal() - $this->_order->getTaxAmount();
+
+        $subPayloadCostTotals->setAmountBeforeTax($amountBeforeTax)
             ->setAmountAfterTax($this->_order->getGrandTotal())
 	    ->setCurrencyCode($this->_order->getBaseCurrencyCode());
         $subPayloadTotalCost->setCostTotals($subPayloadCostTotals);
@@ -619,10 +621,12 @@ class Radial_Eb2cFraud_Model_Build_Request
 
 		if(!$shippingMethod)
 		{
+			$shipCostPreTax = $this->_order->getShippingAmount() - $this->_order->getShippingTaxAmount();
 			$shippingMethod = $this->_order->getShippingMethod();
+		} else {
+			$shipCostPreTax = Mage::getSingleton('checkout/session')->getQuote()->getShippingAddress()->getShippingAmount();
 		}
 
-		$shipCostPreTax = Mage::getSingleton('checkout/session')->getQuote()->getShippingAddress()->getShippingAmount();
                 $shipCostAfterTax = $this->_order->getShippingInclTax();
 
 	        if( strcmp($type, 'virtual') === 0 )
