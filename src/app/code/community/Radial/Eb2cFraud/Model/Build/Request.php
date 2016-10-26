@@ -244,6 +244,7 @@ class Radial_Eb2cFraud_Model_Build_Request
 		$newOrderId = $this->_order->getIncrementId() . '_1';
 		$subPayloadOrder->setOrderId($newOrderId);
 		$subPayloadOrder->setOriginalOrderId($this->_order->getIncrementId());
+		$subPayloadOrder->setOrderCategory("MODIFIED");
 		$subPayloadOrder->setOrderModifiedBy($this->modified_by);
 	} else {
 		$subPayloadOrder->setOrderId($this->_order->getIncrementId());
