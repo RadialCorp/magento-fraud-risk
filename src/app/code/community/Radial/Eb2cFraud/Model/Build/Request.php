@@ -464,14 +464,21 @@ class Radial_Eb2cFraud_Model_Build_Request
      */
     protected function _buildDeviceInfo(Radial_RiskService_Sdk_Device_IInfo $subPayloadDeviceInfo)
     {
-	$sessionId = Mage::getSingleton('core/session')->getEncryptedSessionId();
-	$subPayloadDeviceInfo->setJSCData($this->_httpHelper->getJavaScriptFraudData());
-	$subPayloadDeviceInfo->setSessionID($sessionId);
-	$subPayloadDeviceInfo->setDeviceIP($this->_httpCoreHelper->getRemoteAddr());
-	$subPayloadDeviceInfo->setDeviceHostname($this->_httpCoreHelper->getRemoteHost());
-	$this->_buildHttpHeaders($subPayloadDeviceInfo->getHttpHeaders());
-	$subPayloadDeviceInfo->setUserCookie($this->_httpHelper->getCookiesString());
-        return $this;
+	if($this->modified_by)
+	{
+		$subPayloadDeviceInfo->setDeviceIP($this->_order->getRemoteIp());
+        	$subPayloadDeviceInfo->setDeviceHostname(gethostbyaddr($this->_order->getRemoteIp()));
+	} else {
+		$sessionId = Mage::getSingleton('core/session')->getEncryptedSessionId();
+        	$subPayloadDeviceInfo->setJSCData($this->_httpHelper->getJavaScriptFraudData());
+        	$subPayloadDeviceInfo->setSessionID($sessionId);
+		$subPayloadDeviceInfo->setDeviceIP($this->_httpCoreHelper->getRemoteAddr());
+        	$subPayloadDeviceInfo->setDeviceHostname($this->_httpCoreHelper->getRemoteHost());
+		$this->_buildHttpHeaders($subPayloadDeviceInfo->getHttpHeaders());
+        	$subPayloadDeviceInfo->setUserCookie($this->_httpHelper->getCookiesString());
+	}
+        
+	return $this;
     }
 
     /**
@@ -608,6 +615,11 @@ class Radial_Eb2cFraud_Model_Build_Request
 					$shippingMethod = $address['shipping_method'];
 				}
 			}
+		}
+
+		if(!$shippingMethod)
+		{
+			$shippingMethod = $this->_order->getShippingMethod();
 		}
 
 		$shipCostPreTax = Mage::getSingleton('checkout/session')->getQuote()->getShippingAddress()->getShippingAmount();
