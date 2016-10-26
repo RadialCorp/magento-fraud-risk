@@ -206,7 +206,7 @@ class Radial_Eb2cFraud_Model_Observer extends Radial_Eb2cFraud_Model_Abstract
 		$status = $order->getStatus();
 		$state = $order->getState();
 
-		$accept = [ "risk_submitted", "risk_processing", "risk_rejectpending", "risk_suspend", "risk_ignore", "risk_accept" ];
+		$accept = [ "risk_submitted", "risk_processing", "risk_rejectpending", "risk_suspend", "risk_ignore", "risk_accept", "risk_ready_to_ship_wo_tax" ];
 
 		if( in_array( $status, $accept))
 		{
@@ -222,7 +222,12 @@ class Radial_Eb2cFraud_Model_Observer extends Radial_Eb2cFraud_Model_Abstract
 
 			if( strcmp($this->_config->getOrderStatusForResponseCode($responseCode), "risk_accept") === 0)
                         {
-                                 Mage::dispatchEvent("radial_eb2cfraud_dispatch_fraud_accept", array('order' => $order));
+				if( Mage::getStoreConfig('radial_core/radial_tax_core/enabledmod', $order->getStoreId()) && $order->getData('radial_tax_transmit') !== -1 )
+				{
+					$order->setState($this->_config->getOrderStateForResponseCode($responseCode), "risk_ready_to_ship_wo_tax", "Fraud Accepted - But No Tax Calc ... DO NOT RELEASE ORDER!", false); 	
+				} else {
+                                	Mage::dispatchEvent("radial_eb2cfraud_dispatch_fraud_accept", array('order' => $order));
+				}
                         }
             	} else {
 			$order->addStatusHistoryComment($comment);

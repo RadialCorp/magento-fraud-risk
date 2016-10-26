@@ -15,7 +15,7 @@ http://opensource.org/licenses/osl-3.0.php
 <config>
     <modules>
         <Radial_Eb2cFraud>
-            <version>0.9.8</version>
+            <version>0.9.9</version>
         </Radial_Eb2cFraud>
     </modules>
     <global>
@@ -118,6 +118,14 @@ http://opensource.org/licenses/osl-3.0.php
 				</radial_eb2cfraud_orderconfirmrequest>
 			</observers>
 		</sales_order_save_after>
+		<radial_eb2cfraud_risk_assessment_tax_retry>
+			<observers>
+                                <radial_eb2cfraud_risk_assess_retry_tax>
+                                        <class>radial_eb2cfraud/risk_order</class>
+                                        <method>processRiskOrderRetry</method>
+                                </radial_eb2cfraud_risk_assess_retry_tax>
+                        </observers>
+		</radial_eb2cfraud_risk_assessment_tax_retry>
 	</events>
 	<template>
 		<email>

@@ -44,6 +44,8 @@ class Radial_Eb2cFraud_Model_Build_Request
     protected $_orderIds;
     /** Radial_Core_Helper_Http */
     protected $_httpCoreHelper;
+    /** @var string */
+    protected $modified_by;
 
     /**
      * @param array $initParams Must have this key:
@@ -55,6 +57,7 @@ class Radial_Eb2cFraud_Model_Build_Request
      *				- 'config'  => Radial_Eb2cFraud_Helper_config
      *				- 'shippinghelper' => Radial_Core_Helper_Shipping
      *                          - 'http_core_helper' => Raidal_Core_Helper_Http
+     *				- 'modified_by' => String
      */
     public function __construct(array $initParams=array())
     {
@@ -62,6 +65,11 @@ class Radial_Eb2cFraud_Model_Build_Request
 	{
 		$this->_orderIds = $initParams['order_ids'];
 	}
+
+	if( isset($initParams['modified']))
+        {
+                $this->modified_by = $initParams['modified'];
+        }
 
         list($this->_request, $this->_order, $this->_quote, $this->_helper, $this->_httpHelper, $this->_product, $this->_config, $this->_service, $this->_shippingHelper, $this->_httpCoreHelper) = $this->_checkTypes(
             $this->_nullCoalesce($initParams, 'request', $this->_getNewSdkInstance('Radial_RiskService_Sdk_Request')),
@@ -231,7 +239,16 @@ class Radial_Eb2cFraud_Model_Build_Request
      */
     protected function _buildOrder(Radial_RiskService_Sdk_IOrder $subPayloadOrder)
     {
-        $subPayloadOrder->setOrderId($this->_order->getIncrementId());
+	if( $this->modified_by )
+	{
+		$newOrderId = $this->_order->getIncrementId() . '_1';
+		$subPayloadOrder->setOrderId($newOrderId);
+		$subPayloadOrder->setOriginalOrderId($this->_order->getIncrementId());
+		$subPayloadOrder->setOrderModifiedBy($this->modified_by);
+	} else {
+		$subPayloadOrder->setOrderId($this->_order->getIncrementId());
+	}
+
 	$subPayloadOrder->setPromoCode($this->_order->getCouponCode());	
 	$this->_buildCustomerList($subPayloadOrder->getCustomerList())
              ->_buildShippingList($subPayloadOrder->getShippingList())

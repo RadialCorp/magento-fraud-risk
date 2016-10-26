@@ -247,36 +247,66 @@ class Radial_Eb2cFraud_Model_Risk_Order
 		return $this->_getNewSdkInstance('Radial_RiskService_Sdk_Response');
 	}
 
-	public function processRiskOrder(
-		Mage_Sales_Model_Order $order, Varien_Event_Observer $observer, $orderIds = null
-	)
+	public function processRiskOrder( Mage_Sales_Model_Order $order, Varien_Event_Observer $observer, $orderIds = null)
 	{
-        $request = $this->_getNewEmptyRequest();
+        	$request = $this->_getNewEmptyRequest();
 
-	try
-	{
-        	$payload = Mage::getModel('radial_eb2cfraud/build_request', array(
-        	    'request' => $request,
-        	    'order' => $order,
-		    'order_ids' => $orderIds
-        	))->build();
+		try
+		{
+        		$payload = Mage::getModel('radial_eb2cfraud/build_request', array(
+        		    'request' => $request,
+        		    'order' => $order,
+			    'order_ids' => $orderIds,
+			    'modified' => null
+        		))->build();
 
-		$this->_payloadXml = $payload->serialize();
+			$this->_payloadXml = $payload->serialize();
 
-               $object = Mage::getModel('radial_core/retryQueue');
-               $time = time();
-               $data = array('event_name' => 'risk_assessment_request', 'created_at' => $time, 'message_content' => $this->_payloadXml, 'delivery_status' => 0);
-               $object->setData($data);
-               $object->save();
+               		$object = Mage::getModel('radial_core/retryQueue');
+               		$time = time();
+               		$data = array('event_name' => 'risk_assessment_request', 'created_at' => $time, 'message_content' => $this->_payloadXml, 'delivery_status' => 0);
+               		$object->setData($data);
+               		$object->save();
 
-		// Set order state / status below, then use order history collection
-        	$order->setState("processing", "risk_processing", 'Order is now processing in the Fraud System.', false);
-        	$order->save();
-	} catch( Exception $e ) {
-                $logMessage = sprintf('[%s] Error Payload RiskAssessmentRequest Body: %s', __CLASS__, $e->getMessage());
-                Mage::log($logMessage, Zend_Log::WARN);
-        }
+			// Set order state / status below, then use order history collection
+        		$order->setState("processing", "risk_processing", 'Order is now processing in the Fraud System.', false);
+        		$order->save();
+		} catch( Exception $e ) {
+                	$logMessage = sprintf('[%s] Error Payload RiskAssessmentRequest Body: %s', __CLASS__, $e->getMessage());
+                	Mage::log($logMessage, Zend_Log::WARN);
+        	}
 	}
+
+	public function processRiskOrderRetry(Varien_Event_Observer $observer)
+        {
+                $request = $this->_getNewEmptyRequest();
+		$order = $observer->getEvent()->getOrder();
+
+                try
+                {
+                        $payload = Mage::getModel('radial_eb2cfraud/build_request', array(
+                            'request' => $request,
+                            'order' => $order,
+                            'order_ids' => null,
+			    'modified' => $observer->getEvent()->getModifiedBy()
+                        ))->build();
+
+                        $this->_payloadXml = $payload->serialize();
+
+                        $object = Mage::getModel('radial_core/retryQueue');
+                        $time = time();
+                        $data = array('event_name' => 'risk_assessment_request', 'created_at' => $time, 'message_content' => $this->_payloadXml, 'delivery_status' => 0);
+                        $object->setData($data);
+                        $object->save();
+
+                        // Set order state / status below, then use order history collection
+                        $order->setState("processing", "risk_processing", 'Order is now processing in the Fraud System.', false);
+                        $order->save();
+                } catch( Exception $e ) {
+                        $logMessage = sprintf('[%s] Error Payload RiskAssessmentRequest Body: %s', __CLASS__, $e->getMessage());
+                        Mage::log($logMessage, Zend_Log::WARN);
+                }
+        }
 
         public function processOrderConfirmationRequest(Varien_Event_Observer $observer)
         {

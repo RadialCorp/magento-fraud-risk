@@ -110,15 +110,9 @@ $status->setStatus('risk_retrysubmit')
        ->assignState(Mage_Sales_Model_Order::STATE_PROCESSING)
        ->save();
 
-$installer->run("
-DROP TABLE IF EXISTS {$installer->getTable('radial_eb2cfraud/retryqueue')};
-CREATE TABLE {$installer->getTable('radial_eb2cfraud/retryqueue')} (
-  `retryqueue_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Answer Id',
-  `created_at` datetime NOT NULL COMMENT 'Created At',
-  `event_name` varchar(255) DEFAULT NULL COMMENT 'Event Name',
-  `message_content` text COMMENT 'Message Content',
-  `delivery_status` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Delivery Status',
-  PRIMARY KEY (`retryqueue_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Risk Service Event Log Details';");
+$status->setStatus('risk_ready_to_ship_wo_tax')
+       ->setLabel('Ready to Ship Without Tax')
+       ->assignState(Mage_Sales_Model_Order::STATE_PROCESSING)
+       ->save();
 
 $installer->endSetup();

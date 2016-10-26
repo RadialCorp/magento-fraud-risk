@@ -25,8 +25,8 @@ $installer->startSetup();
 $status = Mage::getModel('sales/order_status');
 
 //Add a new status
-$status->setStatus('risk_retrysubmit')
-       ->setLabel('Fraud Retry Submit')
+$status->setStatus('risk_ready_to_ship_wo_tax')
+       ->setLabel('Ready to Ship Without Tax')
        ->assignState(Mage_Sales_Model_Order::STATE_PROCESSING)
        ->save();
 
