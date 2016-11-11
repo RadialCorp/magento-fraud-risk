@@ -155,9 +155,9 @@ class Radial_Eb2cFraud_Model_Observer extends Radial_Eb2cFraud_Model_Abstract
 
                 Mage::getSingleton('core/session')->setCCAttempts($previous);
         }
-
-    	public function updateOrderStatus(Varien_Event_Observer $observer)
-    	{
+	
+	public function updateOrderStatus(Varien_Event_Observer $observer)
+        {
             $event = $observer->getEvent()->getPayload();
 
             $orderId = $event->getCustomerOrderId();
@@ -178,63 +178,63 @@ class Radial_Eb2cFraud_Model_Observer extends Radial_Eb2cFraud_Model_Abstract
 
             $order = Mage::getModel("sales/order")->loadByIncrementId($orderId);
 
-            if( $this->_config->isDebugMode())
-            {
-                Mage::Log("RiskAssessmentReply Payload: ". $event->serialize());
-            }
-
             if( $order->getId() )
             {
-		if( !$this->_config->isEnabled($order->getStoreId()))
-                {       
-                	Mage::Log("For Order ID: ". $order->getIncrementId() . " Risk Service Module Has Been Disabled. Please go to System->Configuration->Payments,TDF, Fraud->Fraud->Enabled and toggled to 'YES'");
-			return $this;
-		}  
+                if( !$this->_config->isEnabled($order->getStoreId()))
+                {
+                        Mage::Log("For Order ID: ". $order->getIncrementId() . " Risk Service Module Has Been Disabled. Please go to System->Configuration->Payments,TDF, Fraud->Fraud->Enabled and toggled to 'YES'");
+                        return $this;
+                }
 
-		$riskResponseCode = $order->getPayment()->getAdditionalInformation()->getRiskResponseCode();
+                $addlInfo = $order->getPayment()->getAdditionalInformation();
+                $riskResponseCode = $addlInfo['risk_response_code'];
 
-		if( strcmp($riskResponseCode, 'DECLR') === 0 )
-		{
-			$order->cancel();
-			$order->setState($this->_config->getOrderStateForResponseCode($responseCode), $this->_config->getOrderStatusForResponseCode($responseCode), $comment, false);
-			$order->addStatusHistoryComment("Order Auto-Canceled by Webstore: Card Reported Stolen");
-			$order->save();
-			
-			return $this;
-		}
+                if( strcmp($riskResponseCode, 'DECLR') === 0 )
+                {
+                        $order->cancel();
+                        $order->setState($this->_config->getOrderStateForResponseCode($responseCode), $this->_config->getOrderStatusForResponseCode($responseCode), $comment, false);
+                        $order->addStatusHistoryComment("Order Auto-Canceled by Webstore: Card Reported Stolen");
+                        $order->save();
 
-		$status = $order->getStatus();
-		$state = $order->getState();
+                        return $this;
+                }
 
-		$accept = [ "risk_submitted", "risk_processing", "risk_rejectpending", "risk_suspend", "risk_ignore", "risk_accept", "risk_ready_to_ship_wo_tax" ];
+                $status = $order->getStatus();
+                $state = $order->getState();
 
-		if( in_array( $status, $accept))
-		{
-			if( $this->_config->getOrderStateForResponseCode($responseCode) === Mage_Sales_Model_Order::STATE_CANCELED )
-			{
-				$order->cancel();
-				$order->addStatusHistoryComment($comment);
-			} else {
-                		$order->setState($this->_config->getOrderStateForResponseCode($responseCode), $this->_config->getOrderStatusForResponseCode($responseCode), $comment, false);
-			}
+                $accept = [ "risk_submitted", "risk_processing", "risk_rejectpending", "risk_suspend", "risk_ignore", "risk_accept", "risk_ready_to_ship_wo_tax" ];
 
-                	$order->save();
-
-			if( strcmp($this->_config->getOrderStatusForResponseCode($responseCode), "risk_accept") === 0)
+                if( in_array( $status, $accept))
+                {
+                        if( $this->_config->getOrderStateForResponseCode($responseCode) === Mage_Sales_Model_Order::STATE_CANCELED )
                         {
-				if( Mage::getStoreConfig('radial_core/radial_tax_core/enabledmod', $order->getStoreId()) && $order->getData('radial_tax_transmit') !== -1 )
-				{
-					$order->setState($this->_config->getOrderStateForResponseCode($responseCode), "risk_ready_to_ship_wo_tax", "Fraud Accepted - But No Tax Calc ... DO NOT RELEASE ORDER!", false); 	
-				} else {
-                                	Mage::dispatchEvent("radial_eb2cfraud_dispatch_fraud_accept", array('order' => $order));
-				}
+                                $order->cancel();
+                                $order->addStatusHistoryComment($comment);
+                        } else {
+                                $order->setState($this->_config->getOrderStateForResponseCode($responseCode), $this->_config->getOrderStatusForResponseCode($responseCode), $comment, false);
                         }
-            	} else {
-			$order->addStatusHistoryComment($comment);
-			$order->save();
-		}
-	    }
+
+                        $order->save();
+
+                        if( strcmp($this->_config->getOrderStatusForResponseCode($responseCode), "risk_accept") === 0)
+                        {
+                                Mage::Log("Risk Accept Sent");
+
+                                if( Mage::getStoreConfig('radial_core/radial_tax_core/enabledmod', $order->getStoreId()) && $order->getData('radial_tax_transmit') != -1 )
+                                {
+                                        $order->setState($this->_config->getOrderStateForResponseCode($responseCode), "risk_ready_to_ship_wo_tax", "Fraud Accepted - But No Tax Calc ... DO NOT RELEASE ORDER!", false);
+                                } else {
+                                        Mage::Log("Dispatch Fraud Accept for Payments");
+
+                                        Mage::dispatchEvent("radial_eb2cfraud_dispatch_fraud_accept", array('order' => $order));
+                                }
+                        }
+                } else {
+                        $order->addStatusHistoryComment($comment);
+                        $order->save();
+                }
+            }
 
             return $this;
-	}
+        }
 }
