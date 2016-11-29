@@ -249,8 +249,8 @@ class Radial_Eb2cFraud_Model_Build_Request
     {
 	$paymentObj = $this->_order->getPayment();
 
-	if( isset($paymentObj->getAdditionalInformation()['response_code']))
-        {
+        if( isset($paymentObj->getAdditionalInformation()['risk_response_code']) && $paymentObj->getAdditionalInformation()['risk_response_code'])
+	{
 		$subPayloadExternalRiskResult = $subPayloadExternalRiskResults->getEmptyExternalRiskResult();
 		$this->_buildExternalRiskResult($subPayloadExternalRiskResult, $paymentObj);
 		$subPayloadExternalRiskResults->offsetSet($subPayloadExternalRiskResult);
@@ -661,7 +661,7 @@ class Radial_Eb2cFraud_Model_Build_Request
      */
     protected function _buildExternalRiskResult( Radial_RiskService_Sdk_IExternalRiskResult $subPayloadExternalRiskResult, Mage_Sales_Model_Order_Payment $paymentObj)  
     {
-	$subPayloadExternalRiskResult->setCode($paymentObj->getAdditionalInformation()['response_code']);
+	$subPayloadExternalRiskResult->setCode($paymentObj->getAdditionalInformation()['risk_response_code']);
 	$subPayloadExternalRiskResult->setSource("ResponseToWeb");
 	return $this;
     }
