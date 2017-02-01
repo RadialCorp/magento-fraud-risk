@@ -14,8 +14,8 @@
  * @license     http://www.ebayenterprise.com/files/pdf/Magento_Connect_Extensions_EULA_050714.pdf  eBay Enterprise Magento Extensions End User License Agreement
  *
  */
-class EbayEnterprise_RiskInsight_Model_Payment_Adapter_Default
-	extends EbayEnterprise_RiskInsight_Model_Payment_Adapter_Type
+class Radial_Eb2cFraud_Model_Payment_Adapter_Default
+	extends Radial_Eb2cFraud_Model_Payment_Adapter_Type
 {
 	protected function _initialize()
 	{
